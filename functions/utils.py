@@ -40,6 +40,7 @@ def corr_matrix(df,relevant_numeric_columns,threshold=0):
 
 
 def find_outliers(data,col,name):
+  
     sorted_data=np.sort(data[col])
     Q3 = np.quantile(sorted_data, 0.75)
     Q1 = np.quantile(sorted_data, 0.25)
@@ -48,9 +49,9 @@ def find_outliers(data,col,name):
     upper_range = Q3 + 1.5 * IQR
     outlier_free_list = [x for x in sorted_data if (
         (x < lower_range)| (x > upper_range))]
-    #print('outlier_free_list',outlier_free_list)
+
     outliers = data.loc[data[col].isin(outlier_free_list)]
-    #print('outliers',outliers['product_name'])
+     
     
     if len(outliers)>0:
         outliers=outliers[name].values.tolist()
