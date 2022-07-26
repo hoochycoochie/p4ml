@@ -2,7 +2,10 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression,Ridge,Lasso,ElasticNet
+from sklearn.metrics import r2_score,mean_squared_error 
+from sklearn.model_selection import GridSearchCV,RandomizedSearchCV
 
 
 
@@ -37,6 +40,58 @@ def corr_matrix(df,relevant_numeric_columns,threshold=0):
                       .sort_values(ascending=False))
     sol=sol[sol>=threshold]
     print(sol)
+
+def linear_regression_func(df,target_col,feature_cols,test_size=0.25,random_state=42):
+    coefs=dict()
+    X=df[feature_cols].values
+    y=df[target_col].values
+    X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=test_size,random_state=random_state)
+    linear_model=LinearRegression()
+    linear_model.fit(X_train,y_train)
+    y_pred=linear_model.predict(X_test)
+    rmse= np.sqrt(mean_squared_error(y_true = y_test, y_pred = y_pred))
+    x_ax = range(len(y_test))
+    plt.figure(figsize=(20,5))
+    plt.plot(x_ax, y_test, linewidth=1, label="original values of "+target_col)
+    plt.plot(x_ax, y_pred, linewidth=1.1, label="predictions of "+target_col)
+    plt.legend(loc='best',fancybox=True, shadow=True)
+    
+    plt.show() 
+   
+    
+    return linear_model.score(X_test,y_test),rmse,linear_model.coef_
+
+def grid_search_cv_func(df,target_col,feature_cols,param_grid,scoring,model,test_size=0.25,random_state=42,cv=5):
+    X_train,X_test,y_train,y_test=train_test_split(df[feature_cols].values,df[target_col].values,test_size=test_size,random_state=random_state)
+    ridge= GridSearchCV(model, param_grid, scoring=scoring, cv=5)
+    ridge.fit(X_train, y_train)
+    y_pred=ridge.best_estimator_.predict(X_test)
+    rmse= np.sqrt(mean_squared_error(y_true = y_test, y_pred = y_pred))
+    x_ax = range(len(y_test))
+    plt.figure(figsize=(20,5))
+    plt.plot(x_ax, y_test, linewidth=1, label="original values of "+target_col)
+    plt.plot(x_ax, y_pred, linewidth=1.1, label="predictions of "+target_col)
+    plt.legend(loc='best',fancybox=True, shadow=True)
+    
+    plt.show() 
+    return ridge.best_params_,ridge.best_score_,rmse
+
+
+
+def random_search_cv_func(df,target_col,feature_cols,param_grid,scoring,model,test_size=0.25,random_state=42,cv=5):
+    X_train,X_test,y_train,y_test=train_test_split(df[feature_cols].values,df[target_col].values,test_size=test_size,random_state=random_state)
+    ridge= RandomizedSearchCV(model, param_grid, scoring=scoring, cv=5)
+    ridge.fit(X_train, y_train)
+    y_pred=ridge.best_estimator_.predict(X_test)
+    rmse= np.sqrt(mean_squared_error(y_true = y_test, y_pred = y_pred))
+    x_ax = range(len(y_test))
+    plt.figure(figsize=(20,5))
+    plt.plot(x_ax, y_test, linewidth=1, label="original values of "+target_col)
+    plt.plot(x_ax, y_pred, linewidth=1.1, label="predictions of "+target_col)
+    plt.legend(loc='best',fancybox=True, shadow=True)
+    
+    plt.show() 
+    return ridge.best_params_,ridge.best_score_,rmse
 
 
 def find_outliers(data,col,name):
