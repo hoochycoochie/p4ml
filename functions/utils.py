@@ -104,15 +104,15 @@ def corr_matrix(df,relevant_numeric_columns,threshold=0):
     sol=sol[sol>=threshold]
     print(sol)
 
-def linear_regression_func(df,target_col,feature_cols,test_size,random_state,X_train,X_test,y_train,y_test):
+def model_func(df,model,target_col,feature_cols,test_size,random_state,X_train,X_test,y_train,y_test):
     coefs=dict()
    # X=df[feature_cols].values
    # y=df[target_col].values
     start_time = timeit.default_timer()
    # X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=test_size,random_state=random_state)
-    linear_model=LinearRegression()
-    linear_model.fit(X_train,y_train)
-    y_pred=linear_model.predict(X_test)
+    
+    model.fit(X_train,y_train)
+    y_pred=model.predict(X_test)
     elapsed = timeit.default_timer() - start_time
     rmse= np.sqrt(mean_squared_error(y_true = y_test, y_pred = y_pred))
     x_ax = range(len(y_test))
@@ -125,7 +125,7 @@ def linear_regression_func(df,target_col,feature_cols,test_size,random_state,X_t
    
     
    # return linear_model.score(X_test,y_test),rmse,linear_model.coef_
-    return {'best_params':None,'R2':linear_model.score(X_test,y_test),'rmse':rmse,'model':linear_model.__class__.__name__,'time_elapsed':elapsed}
+    return {'best_params':None,'R2':model.score(X_test,y_test),'rmse':rmse,'model':model.__class__.__name__,'time_elapsed':elapsed}
 
 def grid_search_cv_func(df,target_col,feature_cols,param_grid,scoring,model,test_size,random_state,cv,X_train,X_test,y_train,y_test):
     #X_train,X_test,y_train,y_test=train_test_split(df[feature_cols].values,df[target_col].values,test_size=test_size,random_state=random_state)
